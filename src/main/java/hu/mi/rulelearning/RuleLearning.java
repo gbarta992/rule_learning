@@ -6,6 +6,7 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.URISyntaxException;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.SortedMap;
@@ -14,26 +15,72 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class RuleLearning {
-    
+
     private static final Logger LOGGER = LoggerFactory.getLogger(RuleLearning.class);
-    
-    public void start(){
-        SortedMap<Integer, Double> ertekek = fileBeolvas("alapkamat.txt");
+    private final Map<String, Double> tenyezoEntropiak = new HashMap<String, Double>();
+    private SortedMap<Integer, Double> inflacioErtekek = null;
+
+    public void start() {
+        mapFeltolteseTenyezokkel();
         
-        ertekek = RuleLearningUtil.getMapResze(ertekek, true);
+        inflacioErtekek = fileBeolvas("/inflacio/inflacio.txt");
+        LOGGER.debug("inflacioErtekek merete: {}", inflacioErtekek.size());
         
-        List<Double> valoszinusegek = RuleLearningUtil.getValoszinusegek(ertekek);
-        
-        double entropy = RuleLearningUtil.calculateEntropy(valoszinusegek);
-        LOGGER.debug("entropy: {}", entropy);
+        tenyezokAlapjanVizsgalat();
     }
     
+    private void tenyezokAlapjanVizsgalat(){
+        
+        if(tenyezoEntropiak.isEmpty()){
+            return;//megállítja a rekurziót
+        }
+        
+        String legkisebbKulcs = getLegkisebbEntropia();
+        LOGGER.debug("legkisebbKulcs: {}", legkisebbKulcs);
+        
+        //TODO
+        
+        tenyezoEntropiak.remove(legkisebbKulcs);
+        
+        tenyezokAlapjanVizsgalat();
+    }
     
-    public SortedMap<Integer, Double> fileBeolvas(String filenev) {
+    private String getLegkisebbEntropia(){
+        double legkisebbErtek = Double.MAX_VALUE;
+        String legkisebbKulcs = null;
+        
+        for(Map.Entry<String, Double>entry : tenyezoEntropiak.entrySet()){
+            if(entry.getValue() < legkisebbErtek){
+                legkisebbKulcs = entry.getKey();
+            }
+        }
+        return legkisebbKulcs;
+    }
+
+    private void mapFeltolteseTenyezokkel() {
+        tenyezoEntropiak.put("munkanelkuliseg", getEntropyFromStuff("munkanelkuliseg.txt"));
+        tenyezoEntropiak.put("alapkamat", getEntropyFromStuff("alapkamat.txt"));
+    }
+
+    private double getEntropyFromStuff(String filenev) {
+        LOGGER.debug("getEntropyFromStuff filenev: {}", filenev);
+        SortedMap<Integer, Double> ertekek = fileBeolvas("/tenyezok/" + filenev);
+
+        ertekek = RuleLearningUtil.getMapResze(ertekek, true);
+
+        List<Double> valoszinusegek = RuleLearningUtil.getValoszinusegek(ertekek);
+
+        double entropy = RuleLearningUtil.calculateEntropy(valoszinusegek);
+        LOGGER.debug("entropy: {}", entropy);
+
+        return entropy;
+    }
+
+    private SortedMap<Integer, Double> fileBeolvas(String filenev) {
         BufferedReader br = null;
         SortedMap<Integer, Double> response = new TreeMap<Integer, Double>();
         try {
-            File beolvas = new File(getClass().getResource("/tenyezok/" + filenev).toURI());
+            File beolvas = new File(getClass().getResource(filenev).toURI());
             br = new BufferedReader(new FileReader(beolvas));
             String line;
 

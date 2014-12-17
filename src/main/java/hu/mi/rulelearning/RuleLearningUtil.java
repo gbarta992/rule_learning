@@ -12,7 +12,7 @@ import org.slf4j.LoggerFactory;
 public class RuleLearningUtil {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RuleLearningUtil.class);
-    private static final int FELBONTASMERETE = 5;
+    private static final int FELBONTASMERETE = 25;
 
     public static double calculateEntropy(List<Double> valoszinuseg) {
         LOGGER.debug("calculateEntropy valoszinuseg darabszama: {}", valoszinuseg.size());
