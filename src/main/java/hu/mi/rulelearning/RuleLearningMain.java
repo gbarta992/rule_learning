@@ -8,6 +8,11 @@ public class RuleLearningMain {
     private static final Logger LOGGER = LoggerFactory.getLogger(RuleLearningMain.class);
     
     public static void main(String[] args){
-        LOGGER.debug("Hello World!");
+        LOGGER.info("Fut az alkalmazás");
+        
+        RuleLearning ruleLearning = new RuleLearning();
+        ruleLearning.start();
+        
+        LOGGER.info("Véget ért az alkalmazás");
     }
 }
