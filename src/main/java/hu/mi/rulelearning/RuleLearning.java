@@ -19,6 +19,7 @@ public class RuleLearning {
     private static final Logger LOGGER = LoggerFactory.getLogger(RuleLearning.class);
     private final Map<String, Double> tenyezoEntropiak = new HashMap<String, Double>();
     private SortedMap<Integer, Double> inflacioErtekek = null;
+    private Map<String, SortedMap<Integer, Double>> tenyezokAdatai = new HashMap<String, SortedMap<Integer, Double>>();
 
     public void start() {
         mapFeltolteseTenyezokkel();
@@ -38,11 +39,53 @@ public class RuleLearning {
         String legkisebbKulcs = getLegkisebbEntropia();
         LOGGER.debug("legkisebbKulcs: {}", legkisebbKulcs);
         
-        //TODO
+        osszevetTenyezoInflacio(legkisebbKulcs);
         
         tenyezoEntropiak.remove(legkisebbKulcs);
         
         tenyezokAlapjanVizsgalat();
+    }
+    
+    private void osszevetTenyezoInflacio(String kulcs){
+        SortedMap<Integer, Double> aktualisTenyezoAdatai = tenyezokAdatai.get(kulcs);
+        
+        int counter = 0;
+        int irany = 0;
+        double elozoInflacio = 0.0;
+        double elozoTenyezo = 0.0;
+        
+        for(Map.Entry<Integer, Double> entry : aktualisTenyezoAdatai.entrySet()){
+            if(elozoInflacio == 0.0){
+                elozoInflacio = inflacioErtekek.get(entry.getKey());
+                elozoTenyezo = entry.getValue();
+                continue;
+            }
+            
+            //if(irany == 0){
+                irany = iranySzamito(elozoInflacio, inflacioErtekek.get(entry.getKey()), elozoTenyezo, entry.getValue());
+                LOGGER.debug("tenyezo: {}, evszam: {}, irany: {}", kulcs, entry.getKey(), irany);
+            //}
+            
+            elozoInflacio = inflacioErtekek.get(entry.getKey());
+            elozoTenyezo = entry.getValue();
+            counter++;
+            
+            if(counter == aktualisTenyezoAdatai.size()/2 - 1){
+                break;
+            }
+        }
+    }
+    
+    private int iranySzamito(double elozoInflacio, double aktualisInflacio, double elozoTenyezo, double aktualisTenyezo){
+        if(elozoInflacio < aktualisInflacio && elozoTenyezo < aktualisTenyezo){
+            return 1;
+        }else if(elozoInflacio > aktualisInflacio && elozoTenyezo > aktualisTenyezo){
+            return 2;
+        }else if(elozoInflacio == aktualisInflacio && elozoTenyezo == aktualisTenyezo){
+            return 3;
+        }else{
+            return 4;
+        }
     }
     
     private String getLegkisebbEntropia(){
@@ -65,6 +108,8 @@ public class RuleLearning {
     private double getEntropyFromStuff(String filenev) {
         LOGGER.debug("getEntropyFromStuff filenev: {}", filenev);
         SortedMap<Integer, Double> ertekek = fileBeolvas("/tenyezok/" + filenev);
+        
+        tenyezokAdatai.put(filenev.substring(0, filenev.lastIndexOf(".")), ertekek);
 
         ertekek = RuleLearningUtil.getMapResze(ertekek, true);
 
