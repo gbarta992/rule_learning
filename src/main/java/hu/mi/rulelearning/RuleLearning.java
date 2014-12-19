@@ -5,7 +5,9 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,99 +27,97 @@ public class RuleLearning {
 
     public void start() {
         mapFeltolteseTenyezokkel();
-        
+
         inflacioErtekek = fileBeolvas("/inflacio/inflacio.txt");
         LOGGER.debug("inflacioErtekek merete: {}", inflacioErtekek.size());
-        
+
         //Temporary map feltöltése, majd a meghívott függvényben rekurzív törlése
         temporaryTenyezoEntropiak.putAll(tenyezoEntropiak);
-        
+
         tenyezokAlapjanVizsgalat();
-        
+
         ruleLearningBuildTree.kiszamolSzabalyok();
-        
+
         LOGGER.info("Tenyezok eves viselkedese");
-        
-        for(Map.Entry<String, RuleLearningValtozasEnum> entry : ruleLearningBuildTree.getTenyezokEvesViselkedeseAzInflacioval().entrySet()){
+
+        for (Map.Entry<String, RuleLearningValtozasEnum> entry : ruleLearningBuildTree.getTenyezokEvesViselkedeseAzInflacioval().entrySet()) {
             LOGGER.debug("key: {}, value: {}", entry.getKey(), entry.getValue());
         }
-        
+
         LOGGER.info("Csoportos eredmenyek");
-        
-        for(Map.Entry<String, RuleLearningValtozasEnum> entry : ruleLearningBuildTree.getTenyezoCsoportosViselkedeseAzInflacioval().entrySet()){
+
+        for (Map.Entry<String, RuleLearningValtozasEnum> entry : ruleLearningBuildTree.getTenyezoCsoportosViselkedeseAzInflacioval().entrySet()) {
             LOGGER.debug("key: {}, value: {}", entry.getKey(), entry.getValue());
         }
-        
+
         //Újra feltöltjük temporary vizsgálót 
         temporaryTenyezoEntropiak.putAll(tenyezoEntropiak);
         RuleLearningTreeTesting ruleLearningTreeTesting = new RuleLearningTreeTesting(ruleLearningBuildTree, tenyezoEntropiak);
-        
+
         testingTree(ruleLearningTreeTesting);
     }
-    
-    private void testingTree(RuleLearningTreeTesting ruleLearningTreeTesting){
-        
-        if(temporaryTenyezoEntropiak.isEmpty()){
+
+    private void testingTree(RuleLearningTreeTesting ruleLearningTreeTesting) {
+
+        if (temporaryTenyezoEntropiak.isEmpty()) {
             return;//megállítja a rekurziót
         }
-        
+
         String legkisebbKulcs = getLegkisebbEntropia();
         LOGGER.debug("testingTree legkisebbKulcs: {}", legkisebbKulcs);
-        
+
         ruleLearningTreeTesting.testingTreeInflacioByTenyezo(tenyezokAdatai.get(legkisebbKulcs).tailMap(visszaAdKozepsoMapKulcs(legkisebbKulcs, false)), inflacioErtekek, legkisebbKulcs);
-        
+
         temporaryTenyezoEntropiak.remove(legkisebbKulcs);
-        
+
         testingTree(ruleLearningTreeTesting);
     }
-    
-    private void tenyezokAlapjanVizsgalat(){
-        
-        if(temporaryTenyezoEntropiak.isEmpty()){
+
+    private void tenyezokAlapjanVizsgalat() {
+
+        if (temporaryTenyezoEntropiak.isEmpty()) {
             return;//megállítja a rekurziót
         }
-        
+
         String legkisebbKulcs = getLegkisebbEntropia();
         LOGGER.debug("tenyezokAlapjanVizsgalat legkisebbKulcs: {}", legkisebbKulcs);
-        
+
         //osszevetTenyezoInflacio(legkisebbKulcs);
-        
         ruleLearningBuildTree.vizsgalInflacioByTenyezo(tenyezokAdatai.get(legkisebbKulcs).headMap(visszaAdKozepsoMapKulcs(legkisebbKulcs, true)), inflacioErtekek, legkisebbKulcs);
-        
+
         temporaryTenyezoEntropiak.remove(legkisebbKulcs);
-        
+
         tenyezokAlapjanVizsgalat();
     }
-    
-    private Integer visszaAdKozepsoMapKulcs(String kulcs, boolean eleje){
-    SortedMap<Integer, Double> aktualisTenyezoAdatai = tenyezokAdatai.get(kulcs);
-    
+
+    private Integer visszaAdKozepsoMapKulcs(String kulcs, boolean eleje) {
+        SortedMap<Integer, Double> aktualisTenyezoAdatai = tenyezokAdatai.get(kulcs);
+
         int stop = 0;
-        
-        if(eleje){
-            stop = aktualisTenyezoAdatai.size()/2 - 1;
-        }else{
-            stop = aktualisTenyezoAdatai.size()/2;
+
+        if (eleje) {
+            stop = aktualisTenyezoAdatai.size() / 2 - 1;
+        } else {
+            stop = aktualisTenyezoAdatai.size() / 2;
         }
-    
+
         int counter = 0;
-        for(Map.Entry<Integer, Double> entry : aktualisTenyezoAdatai.entrySet()){
-            
-            
-            if(counter == stop){
+        for (Map.Entry<Integer, Double> entry : aktualisTenyezoAdatai.entrySet()) {
+
+            if (counter == stop) {
                 return entry.getKey();
             }
             counter++;
         }
         return null;
     }
-    
-    private String getLegkisebbEntropia(){
+
+    private String getLegkisebbEntropia() {
         double legkisebbErtek = Double.MAX_VALUE;
         String legkisebbKulcs = null;
-        
-        for(Map.Entry<String, Double>entry : temporaryTenyezoEntropiak.entrySet()){
-            if(entry.getValue() < legkisebbErtek){
+
+        for (Map.Entry<String, Double> entry : temporaryTenyezoEntropiak.entrySet()) {
+            if (entry.getValue() < legkisebbErtek) {
                 legkisebbKulcs = entry.getKey();
                 legkisebbErtek = entry.getValue();
             }
@@ -135,7 +135,7 @@ public class RuleLearning {
     private double getEntropyFromStuff(String filenev) {
         LOGGER.debug("getEntropyFromStuff filenev: {}", filenev);
         SortedMap<Integer, Double> ertekek = fileBeolvas("/tenyezok/" + filenev);
-        
+
         tenyezokAdatai.put(filenev.substring(0, filenev.lastIndexOf(".")), ertekek);
 
         ertekek = RuleLearningCalculateEntropy.getMapResze(ertekek, true);
@@ -149,10 +149,11 @@ public class RuleLearning {
     }
 
     private SortedMap<Integer, Double> fileBeolvas(String filenev) {
+        LOGGER.debug("fileBeolvas filenev: {}", filenev);
         BufferedReader br = null;
         SortedMap<Integer, Double> response = new TreeMap<Integer, Double>();
         try {
-            File beolvas = new File(getClass().getResource(filenev).toURI());
+            File beolvas = new File(getClass().getResource(filenev).getFile());
             br = new BufferedReader(new FileReader(beolvas));
             String line;
 
@@ -173,8 +174,8 @@ public class RuleLearning {
             LOGGER.error("FileNotFoundException", e);
         } catch (IOException e) {
             LOGGER.error("IOException", e);
-        } catch (URISyntaxException e) {
-            LOGGER.error("URISyntaxException", e);
+        //} catch (URISyntaxException e) {
+          //  LOGGER.error("URISyntaxException", e);
         } finally {
             try {
                 if (br != null) {

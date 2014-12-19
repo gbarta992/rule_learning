@@ -56,10 +56,18 @@ public class RuleLearningTreeTesting {
                                 LOGGER.debug("Jo meghatarozas no inflacio. Tenyezo: {}, TenyezoNevAlapjan: {}", kulcs + "_" + entry.getKey(), tenyezoNev);
                                 voltTalalat = true;
                                 break;
+                            }else{
+                                LOGGER.debug("Rossz meghatarozas no inflacio. Tenyezo: {}, TenyezoNevAlapjan: {}", kulcs + "_" + entry.getKey(), tenyezoNev);
+                                voltTalalat = true;
+                                break;
                             }
                         } else if (inflacioErtekek.get(entry.getKey() - 1) > inflacioErtekek.get(entry.getKey())) {
                             if (csoportValtozasa == RuleLearningValtozasEnum.INFLACIO_CSOKKEN) {
                                 LOGGER.debug("Jo meghatarozas csokken inflacio. Tenyezo: {}, TenyezoNevAlapjan: {}", kulcs + "_" + entry.getKey(), tenyezoNev);
+                                voltTalalat = true;
+                                break;
+                            }else{
+                                LOGGER.debug("Rossz meghatarozas csokken inflacio. Tenyezo: {}, TenyezoNevAlapjan: {}", kulcs + "_" + entry.getKey(), tenyezoNev);
                                 voltTalalat = true;
                                 break;
                             }
