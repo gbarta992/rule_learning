@@ -108,6 +108,7 @@ public class RuleLearning {
         tenyezoEntropiak.put("munkanelkuliseg", getEntropyFromStuff("munkanelkuliseg.txt"));
         tenyezoEntropiak.put("alapkamat", getEntropyFromStuff("alapkamat.txt"));
         tenyezoEntropiak.put("gdp", getEntropyFromStuff("gdp.txt"));
+        tenyezoEntropiak.put("otp", getEntropyFromStuff("otp.txt"));
     }
 
     private double getEntropyFromStuff(String filenev) {
