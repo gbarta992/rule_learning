@@ -18,6 +18,7 @@ public class RuleLearning {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RuleLearning.class);
     private final Map<String, Double> tenyezoEntropiak = new HashMap<String, Double>();
+    private final Map<String, Double> temporaryTenyezoEntropiak = new HashMap<String, Double>();
     private SortedMap<Integer, Double> inflacioErtekek = null;
     private final Map<String, SortedMap<Integer, Double>> tenyezokAdatai = new HashMap<String, SortedMap<Integer, Double>>();
     private final RuleLearningBuildTree ruleLearningBuildTree = new RuleLearningBuildTree();
@@ -27,6 +28,9 @@ public class RuleLearning {
         
         inflacioErtekek = fileBeolvas("/inflacio/inflacio.txt");
         LOGGER.debug("inflacioErtekek merete: {}", inflacioErtekek.size());
+        
+        //Temporary map feltöltése, majd a meghívott függvényben rekurzív törlése
+        temporaryTenyezoEntropiak.putAll(tenyezoEntropiak);
         
         tenyezokAlapjanVizsgalat();
         
@@ -47,7 +51,7 @@ public class RuleLearning {
     
     private void tenyezokAlapjanVizsgalat(){
         
-        if(tenyezoEntropiak.isEmpty()){
+        if(temporaryTenyezoEntropiak.isEmpty()){
             return;//megállítja a rekurziót
         }
         
@@ -58,7 +62,7 @@ public class RuleLearning {
         
         ruleLearningBuildTree.vizsgalInflacioByTenyezo(tenyezokAdatai.get(legkisebbKulcs).headMap(visszaAdKozepsoMapKulcs(legkisebbKulcs)), inflacioErtekek, legkisebbKulcs);
         
-        tenyezoEntropiak.remove(legkisebbKulcs);
+        temporaryTenyezoEntropiak.remove(legkisebbKulcs);
         
         tenyezokAlapjanVizsgalat();
     }
@@ -82,7 +86,7 @@ public class RuleLearning {
         double legkisebbErtek = Double.MAX_VALUE;
         String legkisebbKulcs = null;
         
-        for(Map.Entry<String, Double>entry : tenyezoEntropiak.entrySet()){
+        for(Map.Entry<String, Double>entry : temporaryTenyezoEntropiak.entrySet()){
             if(entry.getValue() < legkisebbErtek){
                 legkisebbKulcs = entry.getKey();
                 legkisebbErtek = entry.getValue();
