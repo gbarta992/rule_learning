@@ -79,50 +79,6 @@ public class RuleLearning {
         return null;
     }
     
-    private void osszevetTenyezoInflacio(String kulcs){
-        SortedMap<Integer, Double> aktualisTenyezoAdatai = tenyezokAdatai.get(kulcs);
-        
-        int counter = 0;
-        int irany = 0;
-        double elozoInflacio = 0.0;
-        double elozoTenyezo = 0.0;
-        
-        for(Map.Entry<Integer, Double> entry : aktualisTenyezoAdatai.entrySet()){
-            if(elozoInflacio == 0.0){
-                elozoInflacio = inflacioErtekek.get(entry.getKey());
-                elozoTenyezo = entry.getValue();
-                continue;
-            }
-            
-            //if(irany == 0){
-                irany = iranySzamito(elozoInflacio, inflacioErtekek.get(entry.getKey()), elozoTenyezo, entry.getValue());
-                LOGGER.debug("tenyezo: {}, evszam: {}, irany: {}", kulcs, entry.getKey(), irany);
-            //}
-            
-            elozoInflacio = inflacioErtekek.get(entry.getKey());
-            elozoTenyezo = entry.getValue();
-            counter++;
-            
-            if(counter == aktualisTenyezoAdatai.size()/2 - 1){
-                break;
-            }
-        }
-    }
-    
-    private int iranySzamito(double elozoInflacio, double aktualisInflacio, double elozoTenyezo, double aktualisTenyezo){
-        LOGGER.debug("iranySzamito elozoInflacio: {}, aktualisInflacio: {}", elozoInflacio, aktualisInflacio);
-        LOGGER.debug("iranySzamito elozoTenyezo: {}, aktualisTenyezo: {}", elozoTenyezo, aktualisTenyezo);
-        if(elozoInflacio < aktualisInflacio && elozoTenyezo < aktualisTenyezo){
-            return 1;
-        }else if(elozoInflacio > aktualisInflacio && elozoTenyezo > aktualisTenyezo){
-            return 2;
-        }else if(Math.abs(elozoInflacio - aktualisInflacio) < EPSILON && (Math.abs(elozoTenyezo - aktualisTenyezo)) < EPSILON){
-            return 3;
-        }else{
-            return 4;
-        }
-    }
-    
     private String getLegkisebbEntropia(){
         double legkisebbErtek = Double.MAX_VALUE;
         String legkisebbKulcs = null;
