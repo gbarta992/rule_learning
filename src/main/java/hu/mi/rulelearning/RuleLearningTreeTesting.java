@@ -43,10 +43,6 @@ public class RuleLearningTreeTesting {
         for (Map.Entry<Integer, Double> entry : tenyezoErtekek.entrySet()) {
             Double aktualisErtek = entry.getValue();
             
-            if(entry.getKey() == 2010){
-                continue;//Utolsó elemnél már nem tudunk változást nézni
-            }
-            
             for (int i = 1; i <= FELBONTASMERETE; i++) {
                 if (aktualisErtek < min + felbontasEgySzakasza * i) {
                     //ebbe a csoportba tartozik az érték
@@ -55,13 +51,13 @@ public class RuleLearningTreeTesting {
 
                     while (faMelyseg < 4) {
 
-                        if (inflacioErtekek.get(entry.getKey()) < inflacioErtekek.get(entry.getKey() + 1)) {
+                        if (inflacioErtekek.get(entry.getKey() - 1) < inflacioErtekek.get(entry.getKey())) {
                             if (csoportValtozasa == RuleLearningValtozasEnum.INFLACIO_NO) {
                                 LOGGER.debug("Jo meghatarozas no inflacio. Tenyezo: {}, TenyezoNevAlapjan: {}", kulcs + "_" + entry.getKey(), tenyezoNev);
                                 voltTalalat = true;
                                 break;
                             }
-                        } else if (inflacioErtekek.get(entry.getKey()) > inflacioErtekek.get(entry.getKey() + 1)) {
+                        } else if (inflacioErtekek.get(entry.getKey() - 1) > inflacioErtekek.get(entry.getKey())) {
                             if (csoportValtozasa == RuleLearningValtozasEnum.INFLACIO_CSOKKEN) {
                                 LOGGER.debug("Jo meghatarozas csokken inflacio. Tenyezo: {}, TenyezoNevAlapjan: {}", kulcs + "_" + entry.getKey(), tenyezoNev);
                                 voltTalalat = true;

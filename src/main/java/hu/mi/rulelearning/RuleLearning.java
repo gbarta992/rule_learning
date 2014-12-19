@@ -64,7 +64,7 @@ public class RuleLearning {
         String legkisebbKulcs = getLegkisebbEntropia();
         LOGGER.debug("testingTree legkisebbKulcs: {}", legkisebbKulcs);
         
-        ruleLearningTreeTesting.testingTreeInflacioByTenyezo(tenyezokAdatai.get(legkisebbKulcs).tailMap(visszaAdKozepsoMapKulcs(legkisebbKulcs)), inflacioErtekek, legkisebbKulcs);
+        ruleLearningTreeTesting.testingTreeInflacioByTenyezo(tenyezokAdatai.get(legkisebbKulcs).tailMap(visszaAdKozepsoMapKulcs(legkisebbKulcs, false)), inflacioErtekek, legkisebbKulcs);
         
         temporaryTenyezoEntropiak.remove(legkisebbKulcs);
         
@@ -82,21 +82,29 @@ public class RuleLearning {
         
         //osszevetTenyezoInflacio(legkisebbKulcs);
         
-        ruleLearningBuildTree.vizsgalInflacioByTenyezo(tenyezokAdatai.get(legkisebbKulcs).headMap(visszaAdKozepsoMapKulcs(legkisebbKulcs)), inflacioErtekek, legkisebbKulcs);
+        ruleLearningBuildTree.vizsgalInflacioByTenyezo(tenyezokAdatai.get(legkisebbKulcs).headMap(visszaAdKozepsoMapKulcs(legkisebbKulcs, true)), inflacioErtekek, legkisebbKulcs);
         
         temporaryTenyezoEntropiak.remove(legkisebbKulcs);
         
         tenyezokAlapjanVizsgalat();
     }
     
-    private Integer visszaAdKozepsoMapKulcs(String kulcs){
+    private Integer visszaAdKozepsoMapKulcs(String kulcs, boolean eleje){
     SortedMap<Integer, Double> aktualisTenyezoAdatai = tenyezokAdatai.get(kulcs);
+    
+        int stop = 0;
         
+        if(eleje){
+            stop = aktualisTenyezoAdatai.size()/2 - 1;
+        }else{
+            stop = aktualisTenyezoAdatai.size()/2;
+        }
+    
         int counter = 0;
         for(Map.Entry<Integer, Double> entry : aktualisTenyezoAdatai.entrySet()){
             
             
-            if(counter == aktualisTenyezoAdatai.size()/2 - 1){
+            if(counter == stop){
                 return entry.getKey();
             }
             counter++;
