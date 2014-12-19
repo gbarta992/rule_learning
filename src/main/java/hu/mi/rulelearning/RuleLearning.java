@@ -20,7 +20,8 @@ public class RuleLearning {
     private static final double EPSILON = 0.001;
     private final Map<String, Double> tenyezoEntropiak = new HashMap<String, Double>();
     private SortedMap<Integer, Double> inflacioErtekek = null;
-    private Map<String, SortedMap<Integer, Double>> tenyezokAdatai = new HashMap<String, SortedMap<Integer, Double>>();
+    private final Map<String, SortedMap<Integer, Double>> tenyezokAdatai = new HashMap<String, SortedMap<Integer, Double>>();
+    private final RuleLearningBuildTree ruleLearningBuildTree = new RuleLearningBuildTree();
 
     public void start() {
         mapFeltolteseTenyezokkel();
@@ -29,6 +30,20 @@ public class RuleLearning {
         LOGGER.debug("inflacioErtekek merete: {}", inflacioErtekek.size());
         
         tenyezokAlapjanVizsgalat();
+        
+        ruleLearningBuildTree.kiszamolSzabalyok();
+        
+        LOGGER.info("Tenyezok eves viselkedese");
+        
+        for(Map.Entry<String, RuleLearningValtozasEnum> entry : ruleLearningBuildTree.getTenyezokEvesViselkedeseAzInflacioval().entrySet()){
+            LOGGER.debug("key: {}, value: {}", entry.getKey(), entry.getValue());
+        }
+        
+        LOGGER.info("Csoportos eredmenyek");
+        
+        for(Map.Entry<String, RuleLearningValtozasEnum> entry : ruleLearningBuildTree.getTenyezoCsoportosViselkedeseAzInflacioval().entrySet()){
+            LOGGER.debug("key: {}, value: {}", entry.getKey(), entry.getValue());
+        }
     }
     
     private void tenyezokAlapjanVizsgalat(){
@@ -40,11 +55,28 @@ public class RuleLearning {
         String legkisebbKulcs = getLegkisebbEntropia();
         LOGGER.debug("legkisebbKulcs: {}", legkisebbKulcs);
         
-        osszevetTenyezoInflacio(legkisebbKulcs);
+        //osszevetTenyezoInflacio(legkisebbKulcs);
+        
+        ruleLearningBuildTree.vizsgalInflacioByTenyezo(tenyezokAdatai.get(legkisebbKulcs).headMap(visszaAdKozepsoMapKulcs(legkisebbKulcs)), inflacioErtekek, legkisebbKulcs);
         
         tenyezoEntropiak.remove(legkisebbKulcs);
         
         tenyezokAlapjanVizsgalat();
+    }
+    
+    private Integer visszaAdKozepsoMapKulcs(String kulcs){
+    SortedMap<Integer, Double> aktualisTenyezoAdatai = tenyezokAdatai.get(kulcs);
+        
+        int counter = 0;
+        for(Map.Entry<Integer, Double> entry : aktualisTenyezoAdatai.entrySet()){
+            
+            
+            if(counter == aktualisTenyezoAdatai.size()/2 - 1){
+                return entry.getKey();
+            }
+            counter++;
+        }
+        return null;
     }
     
     private void osszevetTenyezoInflacio(String kulcs){
@@ -117,11 +149,11 @@ public class RuleLearning {
         
         tenyezokAdatai.put(filenev.substring(0, filenev.lastIndexOf(".")), ertekek);
 
-        ertekek = RuleLearningUtil.getMapResze(ertekek, true);
+        ertekek = RuleLearningCalculateEntropy.getMapResze(ertekek, true);
 
-        List<Double> valoszinusegek = RuleLearningUtil.getValoszinusegek(ertekek);
+        List<Double> valoszinusegek = RuleLearningCalculateEntropy.getValoszinusegek(ertekek);
 
-        double entropy = RuleLearningUtil.calculateEntropy(valoszinusegek);
+        double entropy = RuleLearningCalculateEntropy.calculateEntropy(valoszinusegek);
         LOGGER.debug("entropy: {}", entropy);
 
         return entropy;

@@ -9,10 +9,10 @@ import java.util.TreeMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class RuleLearningUtil {
+public class RuleLearningCalculateEntropy {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(RuleLearningUtil.class);
-    private static final int FELBONTASMERETE = 25;
+    private static final Logger LOGGER = LoggerFactory.getLogger(RuleLearningCalculateEntropy.class);
+    private static final int FELBONTASMERETE = 4;
 
     public static double calculateEntropy(List<Double> valoszinuseg) {
         LOGGER.debug("calculateEntropy valoszinuseg darabszama: {}", valoszinuseg.size());
