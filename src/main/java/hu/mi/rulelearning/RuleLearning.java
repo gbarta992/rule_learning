@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 public class RuleLearning {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RuleLearning.class);
-    private static final double EPSILON = 0.001;
     private final Map<String, Double> tenyezoEntropiak = new HashMap<String, Double>();
     private SortedMap<Integer, Double> inflacioErtekek = null;
     private final Map<String, SortedMap<Integer, Double>> tenyezokAdatai = new HashMap<String, SortedMap<Integer, Double>>();
