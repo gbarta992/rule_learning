@@ -47,6 +47,28 @@ public class RuleLearning {
         for(Map.Entry<String, RuleLearningValtozasEnum> entry : ruleLearningBuildTree.getTenyezoCsoportosViselkedeseAzInflacioval().entrySet()){
             LOGGER.debug("key: {}, value: {}", entry.getKey(), entry.getValue());
         }
+        
+        //Újra feltöltjük temporary vizsgálót 
+        temporaryTenyezoEntropiak.putAll(tenyezoEntropiak);
+        RuleLearningTreeTesting ruleLearningTreeTesting = new RuleLearningTreeTesting(ruleLearningBuildTree, tenyezoEntropiak);
+        
+        testingTree(ruleLearningTreeTesting);
+    }
+    
+    private void testingTree(RuleLearningTreeTesting ruleLearningTreeTesting){
+        
+        if(temporaryTenyezoEntropiak.isEmpty()){
+            return;//megállítja a rekurziót
+        }
+        
+        String legkisebbKulcs = getLegkisebbEntropia();
+        LOGGER.debug("testingTree legkisebbKulcs: {}", legkisebbKulcs);
+        
+        ruleLearningTreeTesting.testingTreeInflacioByTenyezo(tenyezokAdatai.get(legkisebbKulcs).tailMap(visszaAdKozepsoMapKulcs(legkisebbKulcs)), inflacioErtekek, legkisebbKulcs);
+        
+        temporaryTenyezoEntropiak.remove(legkisebbKulcs);
+        
+        testingTree(ruleLearningTreeTesting);
     }
     
     private void tenyezokAlapjanVizsgalat(){
@@ -56,7 +78,7 @@ public class RuleLearning {
         }
         
         String legkisebbKulcs = getLegkisebbEntropia();
-        LOGGER.debug("legkisebbKulcs: {}", legkisebbKulcs);
+        LOGGER.debug("tenyezokAlapjanVizsgalat legkisebbKulcs: {}", legkisebbKulcs);
         
         //osszevetTenyezoInflacio(legkisebbKulcs);
         
