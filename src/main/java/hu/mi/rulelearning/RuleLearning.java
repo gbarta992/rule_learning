@@ -5,9 +5,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -174,8 +171,6 @@ public class RuleLearning {
             LOGGER.error("FileNotFoundException", e);
         } catch (IOException e) {
             LOGGER.error("IOException", e);
-        //} catch (URISyntaxException e) {
-          //  LOGGER.error("URISyntaxException", e);
         } finally {
             try {
                 if (br != null) {
