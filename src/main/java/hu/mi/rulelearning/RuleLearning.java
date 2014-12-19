@@ -17,6 +17,7 @@ import org.slf4j.LoggerFactory;
 public class RuleLearning {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(RuleLearning.class);
+    private static final double EPSILON = 0.001;
     private final Map<String, Double> tenyezoEntropiak = new HashMap<String, Double>();
     private SortedMap<Integer, Double> inflacioErtekek = null;
     private Map<String, SortedMap<Integer, Double>> tenyezokAdatai = new HashMap<String, SortedMap<Integer, Double>>();
@@ -77,11 +78,13 @@ public class RuleLearning {
     }
     
     private int iranySzamito(double elozoInflacio, double aktualisInflacio, double elozoTenyezo, double aktualisTenyezo){
+        LOGGER.debug("iranySzamito elozoInflacio: {}, aktualisInflacio: {}", elozoInflacio, aktualisInflacio);
+        LOGGER.debug("iranySzamito elozoTenyezo: {}, aktualisTenyezo: {}", elozoTenyezo, aktualisTenyezo);
         if(elozoInflacio < aktualisInflacio && elozoTenyezo < aktualisTenyezo){
             return 1;
         }else if(elozoInflacio > aktualisInflacio && elozoTenyezo > aktualisTenyezo){
             return 2;
-        }else if(elozoInflacio == aktualisInflacio && elozoTenyezo == aktualisTenyezo){
+        }else if(Math.abs(elozoInflacio - aktualisInflacio) < EPSILON && (Math.abs(elozoTenyezo - aktualisTenyezo)) < EPSILON){
             return 3;
         }else{
             return 4;
@@ -103,6 +106,7 @@ public class RuleLearning {
     private void mapFeltolteseTenyezokkel() {
         tenyezoEntropiak.put("munkanelkuliseg", getEntropyFromStuff("munkanelkuliseg.txt"));
         tenyezoEntropiak.put("alapkamat", getEntropyFromStuff("alapkamat.txt"));
+        tenyezoEntropiak.put("gdp", getEntropyFromStuff("gdp.txt"));
     }
 
     private double getEntropyFromStuff(String filenev) {
