@@ -98,6 +98,7 @@ public class RuleLearning {
         for(Map.Entry<String, Double>entry : tenyezoEntropiak.entrySet()){
             if(entry.getValue() < legkisebbErtek){
                 legkisebbKulcs = entry.getKey();
+                legkisebbErtek = entry.getValue();
             }
         }
         return legkisebbKulcs;
